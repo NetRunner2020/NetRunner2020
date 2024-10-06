@@ -1,42 +1,51 @@
-import os
-import re
+# Load the required libraries
+library(pdftools)
+library(tesseract)
 
-def preprocess_text(text):
-    """Perform basic text preprocessing."""
-    # Convert to lowercase
-    text = text.lower()
+# Function to extract text from a single PDF
+extract_text_from_pdf <- function(pdf_path) {
+  tryCatch({
+    # Extract text from the PDF using pdftools
+    text <- pdf_text(pdf_path)
+    
+    if (length(text) == 0) {
+      message("No text found in: ", pdf_path)
+      return(NULL)
+    }
+    
+    return(text)
+  }, error = function(e) {
+    message("Error extracting text from ", pdf_path, ": ", e$message)
+    return(NULL)
+  })
+}
 
-    # Remove special characters and numbers
-    text = re.sub(r'[^a-z\s]', '', text)
+# Function to extract text from all PDFs in a directory and save the extracted text to files
+extract_text_from_pdfs <- function(input_dir, output_dir) {
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir)  # Create output directory if it doesn't exist
+  }
+  
+  pdf_files <- list.files(input_dir, pattern = "\\.pdf$", full.names = TRUE)
+  
+  for (pdf_file in pdf_files) {
+    text <- extract_text_from_pdf(pdf_file)  # Extract text
+    
+    if (!is.null(text)) {
+      # Save the extracted text to a .txt file
+      text_filename <- sub("\\.pdf$", ".txt", basename(pdf_file))
+      text_path <- file.path(output_dir, text_filename)
+      writeLines(text, text_path)
+      message("Extracted text saved to: ", text_path)
+    } else {
+      message("Skipped: No text found in ", pdf_file)
+    }
+  }
+}
 
-    # Remove extra whitespace
-    text = re.sub(r'\s+', ' ', text).strip()
+# Main code
+input_dir <- "C:/Users/Christopher/OneDrive/Documents/PDF"  # Directory containing PDFs
+output_dir <- "C:/Users/Christopher/Documents/extracted_texts"  # Directory to save extracted text
+extract_text_from_pdfs(input_dir, output_dir)
 
-    return text
-
-def preprocess_extracted_text(input_dir, output_dir):
-    """Preprocess all extracted text files in input_dir and save to output_dir."""
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)  # Create output directory if it doesn't exist
-
-    for text_file in os.listdir(input_dir):
-        if text_file.endswith('.txt'):
-            text_path = os.path.join(input_dir, text_file)
-            with open(text_path, 'r', encoding='utf-8') as f:
-                text = f.read()
-
-            # Preprocess the text
-            preprocessed_text = preprocess_text(text)
-
-            # Save the preprocessed text
-            preprocessed_filename = text_file.replace('.txt', '_preprocessed.txt')
-            preprocessed_path = os.path.join(output_dir, preprocessed_filename)
-            with open(preprocessed_path, 'w', encoding='utf-8') as f:
-                f.write(preprocessed_text)
-            print(f"Preprocessed text saved to: {preprocessed_path}")
-
-if __name__ == "__main__":
-    input_dir = '../data/extracted_data/'  # Directory containing extracted text
-    output_dir = '../data/preprocessed_data/'  # Directory to save preprocessed text
-    preprocess_extracted_text(input_dir, output_dir)
-    print("Text preprocessing complete.")
+message("PDF text extraction complete.")
