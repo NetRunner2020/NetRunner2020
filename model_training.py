@@ -1,54 +1,94 @@
-import os
-import mxnet as mx
-from mxnet.gluon import nn, Trainer
-from mxnet.gluon.loss import SoftmaxCrossEntropyLoss
-from mxnet import autograd
-
-def load_preprocessed_data(input_dir):
-    """Load all preprocessed text files in input_dir and return as list."""
-    data = []
-    for text_file in os.listdir(input_dir):
-        if text_file.endswith('_preprocessed.txt'):
-            text_path = os.path.join(input_dir, text_file)
-            with open(text_path, 'r', encoding='utf-8') as f:
-                data.append(f.read())
-    return data
-
-def train_model(data):
-    """Train a simple machine learning model on the preprocessed data."""
-    # This is a simple placeholder model using MXNet's Gluon API.
-    net = nn.Sequential()
-    net.add(nn.Dense(128, activation='relu'))
-    net.add(nn.Dense(64, activation='relu'))
-    net.add(nn.Dense(2))  # Assuming binary classification (change as needed)
-    net.initialize(mx.init.Xavier())
-
-    # Training parameters (placeholders, modify based on your needs)
-    batch_size = 32
-    epochs = 10
-    loss_fn = SoftmaxCrossEntropyLoss()
-    trainer = Trainer(net.collect_params(), 'adam')
-
-    for epoch in range(epochs):
-        cumulative_loss = 0
-        for i in range(0, len(data), batch_size):
-            batch_data = data[i:i + batch_size]
-
-            # Convert data to MXNet NDArrays (Placeholder logic, replace with actual data handling)
-            inputs = mx.nd.array(batch_data)  # You need to transform text into features
-            labels = mx.nd.array([0] * len(batch_data))  # Placeholder labels
-
-            with autograd.record():
-                outputs = net(inputs)
-                loss = loss_fn(outputs, labels)
-            loss.backward()
-            trainer.step(batch_size)
-
-            cumulative_loss += loss.mean().asscalar()
-        print(f"Epoch {epoch+1}, Loss: {cumulative_loss/len(data)}")
-
-if __name__ == "__main__":
-    input_dir = '../data/preprocessed_data/'  # Directory containing preprocessed text
-    data = load_preprocessed_data(input_dir)
-    train_model(data)
-    print("Model training complete.")
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "651917fc",
+   "metadata": {
+    "editable": false,
+    "execution": {
+     "iopub.execute_input": "2025-12-13T18:27:37.615781Z",
+     "iopub.status.busy": "2025-12-13T18:27:37.615466Z",
+     "iopub.status.idle": "2025-12-13T18:27:37.625389Z",
+     "shell.execute_reply": "2025-12-13T18:27:37.624385Z"
+    },
+    "papermill": {
+     "duration": 0.015143,
+     "end_time": "2025-12-13T18:27:37.627144",
+     "exception": false,
+     "start_time": "2025-12-13T18:27:37.612001",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "\n",
+    "os.environ[\"HF_HUB_DISABLE_TELEMETRY\"] = \"1\"\n",
+    "os.environ[\"HF_HUB_OFFLINE\"] = \"1\"\n",
+    "os.environ[\"TRANSFORMERS_OFFLINE\"] = \"1\""
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 23,
+     "sourceId": 2151,
+     "sourceType": "datasetVersion"
+    },
+    {
+     "datasetId": 8971341,
+     "sourceId": 14089605,
+     "sourceType": "datasetVersion"
+    },
+    {
+     "isSourceIdPinned": true,
+     "modelId": 466819,
+     "modelInstanceId": 450464,
+     "sourceId": 601138,
+     "sourceType": "modelInstanceVersion"
+    }
+   ],
+   "dockerImageVersionId": 31192,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.13"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 5.494824,
+   "end_time": "2025-12-13T18:27:38.047932",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2025-12-13T18:27:32.553108",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
